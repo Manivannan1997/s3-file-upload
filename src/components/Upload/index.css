@@ -29,16 +29,49 @@
   
 }
 
-.input-file{
+.input-file {
   margin-bottom: 15px;
 }
 
-.btn-submit{
+.btn-submit {
   background-color: rgb(13 19 170);
   border-radius: 7px;
   border-width: 0px;
   outline: none;
   width: 100%;
+  color: aliceblue;
+  cursor: pointer;
+  padding: 10px;
+  text-align: center;
+}
+
+.close-btn {
+  display: flex;
+  justify-content: end;
+}
+
+.uploaded-img {
+  display: flex;
+  justify-content: center;
+}
+
+.get-all-img {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(243 238 238);
+  border-radius: 7px;
+  padding: 10px;
+}
+
+.get-all-img-btn {
+  background-color: rgb(13 19 170);
+  border-radius: 7px;
+  border-width: 0px;
+  outline: none;
+  width: 250px;
   color: aliceblue;
   cursor: pointer;
   padding: 10px;

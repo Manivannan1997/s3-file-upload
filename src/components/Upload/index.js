@@ -1,28 +1,36 @@
 import React, { useState } from "react";
+import { Oval } from 'react-loader-spinner';
+import { ToastContainer, toast } from 'react-toastify';
+import Modal from 'react-modal';
+import 'react-toastify/dist/ReactToastify.css';
 import './index.css';
 
 const Upload = () => {
   const [selectedFile, setSelectedFile] = useState(null);
-  // const [selectedImage, setImage] = useState(null);
-  const API_URL = `${process.env.API_URL}`
+  const [isLoading, setIsLoading] = useState(false);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState('');
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const API_URL = `${process.env.REACT_APP_API_URL}`
+  const API_IMG_URL = `${process.env.REACT_APP_API_IMG_URL}`
 
   const onChangeImage = (event) => {
     const temp = event.target.files[0];
-    console.log(temp, '......');
     setSelectedFile(temp);
   };
 
   const uploadImg = async (event) => {
     event.preventDefault();
     if (selectedFile) {
+      setIsLoading(true);
+      
       let formData = new FormData();
       formData.append("image", selectedFile);
       // console.log("FormData before sending:");
       // for (let pair of formData.entries()) {
       //   console.log(pair[0], pair[1], "======================");
       // }
-
-      const url = API_URL
+      
+      const url = `${API_URL}/upload`
       const options = {
         method: "POST",
         body: formData,
@@ -31,27 +39,68 @@ const Upload = () => {
           accept:'application/json',
         },
       } 
-
-      const response = await fetch(url, options)
-      const data = await response.json()
-      console.log(response)
-      if (data.status === 200) {
-        console.log("File uploaded successfully!");
-      } else {
-        console.log("File upload failed.");
+      try {
+        const response = await fetch(url, options)
+        const data = await response.json()
+        if (response.status === 200) {
+          setSelectedFile(null);
+          setUploadedImageUrl(`${API_IMG_URL}/${data.image_url}`);
+          setModalIsOpen(true);
+          toast.success('File uploaded successfully');
+        } else {          
+          toast.error('File upload failed');
+        }
+        setIsLoading(false);        
+      } catch (error) {
+        toast.error('An error occurred'); // Display error toast
       }
+    } else {
+      toast.error('Please select the file');
     }
   };
 
+  const closeModal = () => {
+    setModalIsOpen(false);
+  };
+
   return (
-    <div className="form-container">
-      <form className="form-sub-container" onSubmit={uploadImg}>
-        <span className="heading">Upload File</span>
-        <input className="input-file" onChange={onChangeImage} type='file' accept='image/*' />
-        <button className="btn-submit" type='submit'>Upload</button>
-      </form>
-      {/* <img src={selectedFile}></img> */}
-    </div>
+    <>
+      <ToastContainer position='top-right' />
+      <div className="form-container">
+        {isLoading ? (
+          <Oval
+            type="Oval"
+            color="#00BFFF"
+            height={50}
+            width={50}
+          />
+        ) : (
+          <form className="form-sub-container" onSubmit={uploadImg}>
+            <span className="heading">Upload File</span>
+            <input className="input-file" onChange={onChangeImage} type='file' accept='image/*' />
+            <button className="btn-submit" type='submit'>Upload</button>
+          </form>
+        )}
+        {modalIsOpen && (
+          <Modal
+            isOpen={modalIsOpen}
+            onRequestClose={closeModal}
+            contentLabel="Uploaded Image Modal"
+          >
+            <div>
+              <div className="close-btn">
+                <button className="modal-close" onClick={closeModal}>
+                  Close
+                </button>
+              </div>
+              <div className="uploaded-img">
+                <img src={uploadedImageUrl} alt="Uploaded" />
+              </div>
+            </div>
+          </Modal>
+        )} 
+      </div>
+    </>
   );
 };
 
